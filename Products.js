@@ -253,87 +253,99 @@ function Products() {
         </div>
 
         {/* جميع المنتجات */}
-        <div className="all-products-section">
-          <div className="container">
-            <div className="section-header">
-              <h2>{t('products.allProducts') || 'جميع المنتجات'}</h2>
-              {filteredProducts.length !== products.length && (
-                <div className="results-count">
-                  {t('products.showing') || 'عرض'} {filteredProducts.length} {t('products.of') || 'من'} {products.length} {t('products.products') || 'منتج'}
-                </div>
-              )}
-            </div>
-            
-            <div className="products-grid">
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => {
-                  const display = getProductDisplay(product);
-                  return (
-                    <div key={product.id} className="product-card">
-                      <div className="product-image">
-                        <img 
-                          src={product.image} 
-                          alt={display.name} 
-                          className="product-img"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="product-info">
-                        <h3 className="product-name">{display.name}</h3>
-                        <p className="product-description">
-                          {display.description.substring(0, 120)}...
-                        </p>
-                        <div className="product-meta">
-                          <div className="product-size">
-                            <span className="meta-label">{t('products.size') || 'الحجم'}:</span>
-                            <span className="meta-value">{display.size}</span>
-                          </div>
-                          <div className="product-category">
-                            <span className="meta-label">{t('products.category') || 'التصنيف'}:</span>
-                            <span className="meta-value">{display.category}</span>
-                          </div>
-                        </div>
-                        <div className="product-hashtags">
-                          {product.hashtags.slice(0, 4).map((tag, i) => (
-                            <button 
-                              key={i} 
-                              className="hashtag-btn"
-                              onClick={() => {
-                                setSearchTerm(tag);
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                              }}
-                            >
-                              #{tag}
-                            </button>
-                          ))}
-                        </div>
-                        <button 
-                          className="product-details-btn"
-                          onClick={() => openModal(product)}
-                        >
-                          {t('products.readMore') || 'اقرأ المزيد'}
-                          <span className="btn-arrow">→</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="no-results">
-                  <span className="no-results-icon">🔍</span>
-                  <h3>{t('products.noResults') || 'لا توجد منتجات'}</h3>
-                  <p>{t('products.noResultsText') || 'لم نجد منتجات تطابق بحثك. حاول بكلمات مختلفة.'}</p>
-                  <button className="reset-search" onClick={() => {
-                    setSearchTerm('');
-                    setSelectedCategory('all');
-                  }}>
-                    {t('products.resetSearch') || 'إعادة تعيين البحث'}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+<div className="all-products-section">
+  <div className="container">
+    <div className="section-header">
+      <h2>{t('products.allProducts') || 'جميع المنتجات'}</h2>
+      {filteredProducts.length !== products.length && (
+        <div className="results-count">
+          {t('products.showing') || 'عرض'} {filteredProducts.length} {t('products.of') || 'من'} {products.length} {t('products.products') || 'منتج'}
         </div>
+      )}
+    </div>
+    
+    <div className="products-grid">
+      {filteredProducts.length > 0 ? (
+        filteredProducts.map((product) => {
+          const display = getProductDisplay(product);
+          const sizeOptions = getLocalizedSizeOptions(product);
+          return (
+            <div key={product.id} className="product-card">
+              <div className="product-image">
+                <img 
+                  src={product.image} 
+                  alt={display.name} 
+                  className="product-img"
+                  loading="lazy"
+                />
+              </div>
+              <div className="product-info">
+                <h3 className="product-name">{display.name}</h3>
+                <p className="product-description">
+                  {display.description.substring(0, 100)}...
+                </p>
+                
+                {/* ✅ قسم الأحجام - يظهر جميع الخيارات */}
+                <div className="product-sizes-container">
+                  <span className="sizes-label">{t('products.availableSizes') || 'الأحجام المتاحة'}:</span>
+                  <div className="product-sizes-list">
+                    {sizeOptions.map((sizeOption, idx) => (
+                      <span key={idx} className="product-size-badge">
+                        {sizeOption}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="product-meta">
+                  <div className="product-category">
+                    <span className="meta-label">{t('products.category') || 'التصنيف'}:</span>
+                    <span className="meta-value">{display.category}</span>
+                  </div>
+                </div>
+                
+                <div className="product-hashtags">
+                  {product.hashtags.slice(0, 3).map((tag, i) => (
+                    <button 
+                      key={i} 
+                      className="hashtag-btn"
+                      onClick={() => {
+                        setSearchTerm(tag);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                    >
+                      #{tag}
+                    </button>
+                  ))}
+                </div>
+                
+                <button 
+                  className="product-details-btn"
+                  onClick={() => openModal(product)}
+                >
+                  {t('products.viewDetails') || 'عرض التفاصيل'}
+                  <span className="btn-arrow">→</span>
+                </button>
+              </div>
+            </div>
+          );
+        })
+      ) : (
+        <div className="no-results">
+          <span className="no-results-icon">🔍</span>
+          <h3>{t('products.noResults') || 'لا توجد منتجات'}</h3>
+          <p>{t('products.noResultsText') || 'لم نجد منتجات تطابق بحثك. حاول بكلمات مختلفة.'}</p>
+          <button className="reset-search" onClick={() => {
+            setSearchTerm('');
+            setSelectedCategory('all');
+          }}>
+            {t('products.resetSearch') || 'إعادة تعيين البحث'}
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
 
         {/* المنتجات المميزة */}
         <div className="featured-products-section">
