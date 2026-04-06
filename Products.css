@@ -2009,3 +2009,88 @@ html[dir="rtl"] .modal-close-btn {
 .featured-icon img{
     width: 100%;
 }
+/* ========== عرض خيارات الأحجام على البطاقة ========== */
+
+.product-sizes-container {
+  margin: 12px 0;
+  padding: 8px 0;
+  border-top: 1px solid rgba(100, 108, 255, 0.08);
+  border-bottom: 1px solid rgba(100, 108, 255, 0.08);
+}
+
+.sizes-label {
+  font-size: 0.7rem;
+  color: #888;
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.product-sizes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-size-badge {
+  display: inline-block;
+  background: #f8faff;
+  border: 1px solid rgba(100, 108, 255, 0.15);
+  color: #646cff;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.product-size-badge:hover {
+  background: #646cff;
+  color: white;
+  border-color: #646cff;
+  transform: translateY(-2px);
+}
+
+/* تحسين تنسيق القسم */
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  padding: 6px 0;
+}
+
+.product-category {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.meta-label {
+  font-size: 0.7rem;
+  color: #999;
+}
+
+.meta-value {
+  font-size: 0.75rem;
+  color: #a855f7;
+  font-weight: 500;
+}
+
+/* للشاشات الصغيرة */
+@media (max-width: 480px) {
+  .product-sizes-list {
+    gap: 6px;
+  }
+  
+  .product-size-badge {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+  }
+  
+  .sizes-label {
+    font-size: 0.65rem;
+  }
+}
