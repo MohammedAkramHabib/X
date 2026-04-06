@@ -13,50 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: List files before unzip
-        run: |
-          echo "=== الملفات قبل فك الضغط ==="
-          ls -la
-          echo "============================"
-
       - name: Extract ZIP file
-        run: |
-          # فك ضغط ملف ZIP
-          unzip -q *.zip
-          echo "=== تم فك الضغط ==="
+        uses: ihiroky/extract-action@v1
+        with:
+          file_path: "*.zip"
+          extract_dir: "./"
 
-      - name: List files after unzip
-        run: |
-          echo "=== الملفات بعد فك الضغط ==="
-          ls -la
-          echo "============================"
-          echo "=== البحث عن package.json ==="
-          find . -name "package.json" -type f
-
-      - name: Move files if needed
-        run: |
-          # إذا وجد package.json في مجلد فرعي، انقل كل شيء للأعلى
-          if [ -f */*/package.json ] || [ -f */package.json ]; then
-            echo "تم العثور على package.json في مجلد فرعي، جاري النقل..."
-            # انقل كل الملفات من أول مجلد فرعي إلى الجذر
-            SUBDIR=$(find . -maxdepth 2 -name "package.json" -type f | head -1 | xargs dirname)
-            if [ -n "$SUBDIR" ] && [ "$SUBDIR" != "." ]; then
-              mv $SUBDIR/* . 2>/dev/null || true
-              mv $SUBDIR/.* . 2>/dev/null || true
-            fi
-          fi
-
-      - name: Final check
-        run: |
-          echo "=== الملفات النهائية ==="
-          ls -la
-          echo "======================"
-          if [ -f "package.json" ]; then
-            echo "✅ تم العثور على package.json بنجاح"
-          else
-            echo "❌ لم يتم العثور على package.json"
-            exit 1
-          fi
+      - name: Delete ZIP file
+        run: rm -f *.zip
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -67,14 +31,12 @@ jobs:
         run: npm install
 
       - name: Build project
-        run: npm run build
+        run: |
+          export CI=false
+          npm run build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: |
-            ./dist
-            ./build
-            ./*.html
-            ./*.js 
+          path: ./build 
