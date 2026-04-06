@@ -13,14 +13,56 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract ZIP file
-        uses: ihiroky/extract-action@v1
-        with:
-          file_path: "*.zip"
-          extract_dir: "./"
+      - name: List files before unzip
+        run: |
+          echo "=== ملفات قبل فك الضغط ==="
+          ls -la
+          pwd
 
-      - name: Delete ZIP file
-        run: rm -f *.zip
+      - name: Extract ZIP file
+        run: |
+          # فك ضغط ملف ZIP
+          unzip -o *.zip
+          echo "=== تم فك الضغط ==="
+
+      - name: List files after unzip
+        run: |
+          echo "=== ملفات بعد فك الضغط ==="
+          ls -la
+          echo "=== البحث عن package.json ==="
+          find . -name "package.json" -type f
+
+      - name: Move files from subdirectory if needed
+        run: |
+          # إذا كان package.json في مجلد فرعي، انقل كل شيء للأعلى
+          if [ -f "package.json" ]; then
+            echo "✅ package.json موجود في الجذر"
+          else
+            echo "⚠️ package.json غير موجود في الجذر، جاري البحث..."
+            # ابحث عن أول مجلد يحتوي على package.json
+            SUBDIR=$(find . -maxdepth 2 -name "package.json" -type f | head -1 | xargs dirname)
+            if [ -n "$SUBDIR" ] && [ "$SUBDIR" != "." ]; then
+              echo "📁 تم العثور على package.json في: $SUBDIR"
+              echo "🔄 جاري نقل الملفات..."
+              mv $SUBDIR/* . 2>/dev/null || true
+              mv $SUBDIR/.* . 2>/dev/null || true
+              rm -rf $SUBDIR 2>/dev/null || true
+            fi
+          fi
+
+      - name: Final verification
+        run: |
+          echo "=== الملفات النهائية ==="
+          ls -la
+          if [ -f "package.json" ]; then
+            echo "✅ تم العثور على package.json بنجاح"
+            cat package.json | head -10
+          else
+            echo "❌ لم يتم العثور على package.json"
+            echo "🔍 محتويات الدليل الحالي:"
+            ls -la
+            exit 1
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,7 +70,9 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          echo "✅ تم تثبيت الحزم"
 
       - name: Build project
         run: |
@@ -39,4 +83,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: ./build 
+          path: ./build
