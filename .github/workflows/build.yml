@@ -1,0 +1,40 @@
+name: Unzip and Build
+
+on:
+  push:
+    paths:
+      - '**.zip'
+  workflow_dispatch:
+
+jobs:
+  unzip-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract ZIP file
+        uses: ihiroky/extract-action@v1
+        with:
+          file_path: "*.zip"
+          extract_dir: "./"
+
+      - name: Delete ZIP file
+        run: rm -f *.zip
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: ./dist
